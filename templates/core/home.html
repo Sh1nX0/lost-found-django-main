@@ -1,0 +1,15 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Lost & Found - Главная{% endblock %}
+
+{% block content %}
+<h1>Lost & Found Platform</h1>
+<p>Платформа для поиска потерянных вещей</p>
+
+<h3>Быстрые действия:</h3>
+<ul>
+    <li><a href="{% url 'item_list' %}">Посмотреть все предметы</a></li>
+    <li><a href="{% url 'add_item' %}">Добавить новый предмет</a></li>
+    <li><a href="/admin/">Панель администратора</a></li>
+</ul>
+{% endblock %}
