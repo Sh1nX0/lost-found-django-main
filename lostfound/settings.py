@@ -81,6 +81,12 @@ DATABASES = {
     }
 }
 
+
+INSTALLED_APPS = [
+    # ...
+    'items.apps.ItemsConfig',  # Добавьте эту строку
+]
+
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {
