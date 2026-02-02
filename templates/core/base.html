@@ -3,20 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Lost & Found{% endblock %}</title>
+    <title>{% block title %}🔍 Lost & Found System{% endblock %}</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔍</text></svg>">
 </head>
 <body>
-    <nav>
-        <a href="{% url 'home' %}">Главная</a>
-        <a href="{% url 'item_list' %}">Все предметы</a>
-        <a href="{% url 'add_item' %}">Добавить предмет</a>
-        <a href="/admin/">Админка</a>
-    </nav>
-    
+    <header>
+        <nav>
+            <div class="logo">
+                <h1>🔍 Lost & Found System</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="{% url 'home' %}">🏠 Главная</a></li>
+                <li><a href="{% url 'item_list' %}">📋 Все предметы</a></li>
+                <li><a href="/admin/" target="_blank">⚙️ Админка</a></li>
+                <li><a href="/api/items/" target="_blank">🔗 API</a></li>
+            </ul>
+        </nav>
+    </header>
+
     <main>
-        {% block content %}{% endblock %}
+        {% block content %}
+        <!-- Контент будет здесь -->
+        {% endblock %}
     </main>
+
+    <footer>
+        <p>© 2024 Lost & Found System | Django Project | Assignment 8</p>
+        <p>API доступен по адресу: <code>/api/items/</code></p>
+    </footer>
 </body>
 </html>

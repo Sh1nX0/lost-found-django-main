@@ -1,22 +1,91 @@
 {% extends 'core/base.html' %}
 
-{% block title %}Все предметы - Lost & Found{% endblock %}
+{% block title %}Все предметы | Lost & Found{% endblock %}
 
 {% block content %}
-<h1>Все предметы</h1>
+<div class="items-table-container">
+    <h1>📋 Список всех предметов</h1>
+    <p style="color: #666; margin-bottom: 2rem;">Всего предметов в базе: {{ page_obj.paginator.count }}</p>
 
-<div class="items">
-    {% for item in items %}
-    <div class="item-card">
-        <h3>{{ item.title }}</h3>
-        <p>{{ item.description|truncatechars:100 }}</p>
-        <p class="status-{{ item.status }}">
-            Статус: {{ item.get_status_display }}
-        </p>
-        <a href="{% url 'item_detail' item.id %}">Подробнее</a>
+    <div class="filters">
+        <a href="?status=all" class="filter-btn {% if status_filter == 'all' %}active{% endif %}">Все ({{ page_obj.paginator.count }})</a>
+        <a href="?status=found" class="filter-btn {% if status_filter == 'found' %}active{% endif %}">Найдено ({{ found_count }})</a>
+        <a href="?status=lost" class="filter-btn {% if status_filter == 'lost' %}active{% endif %}">Потеряно ({{ lost_count }})</a>
     </div>
-    {% empty %}
-    <p>Предметы не найдены.</p>
-    {% endfor %}
+
+    {% if items %}
+        <div style="overflow-x: auto;">
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Название</th>
+                        <th>Описание</th>
+                        <th>Статус</th>
+                        <th>Дата</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr class="{% if item.found %}found-row{% else %}lost-row{% endif %}">
+                        <td><strong>#{{ item.id }}</strong></td>
+                        <td><strong>{{ item.title }}</strong></td>
+                        <td>{{ item.description|truncatechars:80 }}</td>
+                        <td>
+                            {% if item.found %}
+                                <span class="badge found">✅ Найдено</span>
+                            {% else %}
+                                <span class="badge lost">❌ Потеряно</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ item.created_at|date:"d.m.Y H:i" }}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="{% url 'item_detail' item.id %}" class="btn-api">👁️</a>
+                                <a href="{% url 'api-item-detail' item.id %}" class="btn-api" target="_blank">🔗 API</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Пагинация -->
+        {% if is_paginated %}
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?page=1&status={{ status_filter }}">« Первая</a>
+                <a href="?page={{ page_obj.previous_page_number }}&status={{ status_filter }}">‹ Назад</a>
+            {% endif %}
+            
+            <span>Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+            
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}&status={{ status_filter }}">Вперед ›</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}&status={{ status_filter }}">Последняя »</a>
+            {% endif %}
+        </div>
+        {% endif %}
+        
+        <div style="margin-top: 2rem; padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+            <p><strong>💡 Подсказка:</strong> Используйте API для работы с предметами:</p>
+            <code style="display: block; background: #2c3e50; color: white; padding: 0.5rem; border-radius: 4px; margin-top: 0.5rem;">
+                curl -X GET http://localhost:8000/api/items/
+            </code>
+        </div>
+    {% else %}
+        <div class="no-items">
+            <p style="font-size: 1.2rem; margin-bottom: 1rem;">📭 Пока нет предметов в базе данных.</p>
+            <a href="/admin/core/item/add/" class="btn-api">➕ Добавить первый предмет</a>
+            <p style="margin-top: 1rem; color: #666;">Или используйте API для добавления:</p>
+            <code style="display: block; background: #f8f9fa; padding: 1rem; border-radius: 4px; margin-top: 0.5rem; font-family: monospace;">
+                curl -X POST http://localhost:8000/api/items/ \<br>
+                -H "Content-Type: application/json" \<br>
+                -d '{"title": "Пример", "description": "Описание", "found": false}'
+            </code>
+        </div>
+    {% endif %}
 </div>
 {% endblock %}

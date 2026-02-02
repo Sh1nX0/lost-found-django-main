@@ -1,15 +1,38 @@
-{% extends 'core/base.html' %}
+                <div class="item-meta">
+                    <span class="status">
+                        {% if item.found %}
+                            🟢 Найдено
+                        {% else %}
+                            🔴 Потеряно
+                        {% endif %}
+                    </span>
+                    <span class="date">{{ item.created_at|date:"d.m.Y" }}</span>
+                </div>
+                <div class="action-buttons">
+                    <a href="{% url 'item_detail' item.id %}" class="btn-api">Подробнее</a>
+                    <a href="{% url 'api-item-detail' item.id %}" class="btn-api">API</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div style="text-align: center; margin-top: 2rem;">
+            <a href="{% url 'item_list' %}" class="btn-api" style="padding: 1rem 2rem; font-size: 1.1rem;">
+                📋 Посмотреть все предметы
+            </a>
+        </div>
+    {% else %}
+        <p class="no-items">Пока нет добавленных предметов. <a href="/admin/core/item/add/">Добавьте первый!</a></p>
+    {% endif %}
+</div>
 
-{% block title %}Lost & Found - Главная{% endblock %}
-
-{% block content %}
-<h1>Lost & Found Platform</h1>
-<p>Платформа для поиска потерянных вещей</p>
-
-<h3>Быстрые действия:</h3>
-<ul>
-    <li><a href="{% url 'item_list' %}">Посмотреть все предметы</a></li>
-    <li><a href="{% url 'add_item' %}">Добавить новый предмет</a></li>
-    <li><a href="/admin/">Панель администратора</a></li>
-</ul>
+<div class="api-info" style="background: white; padding: 2rem; border-radius: 15px; margin-top: 2rem; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
+    <h3>🔗 Доступные API endpoints:</h3>
+    <ul style="list-style: none; margin-top: 1rem;">
+        <li><strong>GET</strong> <code>/api/items/</code> - все предметы</li>
+        <li><strong>POST</strong> <code>/api/items/</code> - создать предмет</li>
+        <li><strong>GET</strong> <code>/api/items/1/</code> - предмет по ID</li>
+        <li><strong>GET</strong> <code>/api/items/found/</code> - только найденные</li>
+        <li><strong>GET</strong> <code>/api/items/lost/</code> - только потерянные</li>
+    </ul>
+</div>
 {% endblock %}

@@ -4,8 +4,23 @@ from .models import Item
 class ItemForm(forms.ModelForm):
     class Meta:
         model = Item
-        fields = ['title', 'description', 'category', 'location', 'status', 'image', 'date_lost_found', 'contact_info']
+        fields = ['title', 'description', 'found', 'location', 'contact_info']
         widgets = {
-            'date_lost_found': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
-            'description': forms.Textarea(attrs={'rows': 4}),
+            'title': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Название предмета'
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 4,
+                'placeholder': 'Подробное описание'
+            }),
+            'location': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Где нашли/потеряли'
+            }),
+            'contact_info': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Email или телефон'
+            }),
         }

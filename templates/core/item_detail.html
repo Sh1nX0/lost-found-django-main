@@ -1,0 +1,90 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{{ item.title }} | Lost & Found{% endblock %}
+
+{% block content %}
+<div class="item-detail">
+    <a href="{% url 'item_list' %}" class="back-link">← Назад к списку предметов</a>
+    
+    <div class="detail-card {% if item.found %}found{% else %}lost{% endif %}">
+        <h1>{{ item.title }}</h1>
+        
+        <div class="item-info">
+            <p>
+                <strong>📝 Описание:</strong> 
+                <span style="margin-left: 1rem;">{{ item.description }}</span>
+            </p>
+            
+            <p>
+                <strong>📍 Место:</strong> 
+                <span style="margin-left: 1rem;">{{ item.location|default:"Не указано" }}</span>
+            </p>
+            
+            <p>
+                <strong>📞 Контактная информация:</strong> 
+                <span style="margin-left: 1rem;">{{ item.contact_info|default:"Не указано" }}</span>
+            </p>
+            
+            <p>
+                <strong>🆔 ID:</strong> 
+                <span style="margin-left: 1rem;">{{ item.id }}</span>
+            </p>
+            
+            <p>
+                <strong>📅 Дата создания:</strong> 
+                <span style="margin-left: 1rem;">{{ item.created_at|date:"d.m.Y H:i" }}</span>
+            </p>
+            
+            <p>
+                <strong>🔄 Последнее обновление:</strong> 
+                <span style="margin-left: 1rem;">{{ item.updated_at|date:"d.m.Y H:i" }}</span>
+            </p>
+        </div>
+        
+        <div class="status-display">
+            {% if item.found %}
+                <div class="big-status found">✅ ПРЕДМЕТ НАЙДЕН</div>
+                <p style="font-size: 1.1rem; margin-top: 1rem;">
+                    Этот предмет был найден. Если это ваша вещь, свяжитесь по указанным контактам!
+                </p>
+            {% else %}
+                <div class="big-status lost">❌ ПРЕДМЕТ ПОТЕРЯН</div>
+                <p style="font-size: 1.1rem; margin-top: 1rem;">
+                    Этот предмет потерян. Если вы его нашли, пожалуйста, свяжитесь с владельцем!
+                </p>
+            {% endif %}
+        </div>
+        
+        <div class="api-links">
+            <h3>🔗 API ссылки для этого предмета:</h3>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem;">
+                <a href="{% url 'api-item-detail' item.id %}" class="api-link" target="_blank">
+                    📊 JSON данные
+                </a>
+                <a href="/admin/core/item/{{ item.id }}/change/" class="api-link" target="_blank">
+                    ✏️ Редактировать в админке
+                </a>
+                <button onclick="copyApiUrl()" class="api-link" style="cursor: pointer;">
+                    📋 Скопировать API URL
+                </button>
+            </div>
+            
+            <div style="margin-top: 2rem; background: #f8f9fa; padding: 1rem; border-radius: 8px;">
+                <p><strong>Пример запроса в Postman:</strong></p>
+                <code style="display: block; background: #2c3e50; color: white; padding: 0.8rem; border-radius: 4px; margin-top: 0.5rem; font-family: monospace; font-size: 0.9rem;">
+                    GET {{ request.scheme }}://{{ request.get_host }}{% url 'api-item-detail' item.id %}
+                </code>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function copyApiUrl() {
+    const apiUrl = "{{ request.scheme }}://{{ request.get_host }}{% url 'api-item-detail' item.id %}";
+    navigator.clipboard.writeText(apiUrl).then(() => {
+        alert('API URL скопирован в буфер обмена:\n' + apiUrl);
+    });
+}
+</script>
+{% endblock %}
