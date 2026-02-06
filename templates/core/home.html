@@ -1,3 +1,40 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Главная | Lost & Found{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h2>Добро пожаловать в систему Lost & Found!</h2>
+    <p>
+        Эта система создана для помощи в поиске потерянных вещей и возврате найденных предметов их владельцам.
+        Вы можете просматривать список предметов, добавлять новые или использовать REST API для интеграции.
+    </p>
+    
+    <div class="stats">
+        <div class="stat-card">
+            <h3>🎯 Всего предметов</h3>
+            <p class="count">{{ total_items }}</p>
+        </div>
+        <div class="stat-card">
+            <h3>✅ Найдено</h3>
+            <p class="count">{{ found_count }}</p>
+        </div>
+        <div class="stat-card">
+            <h3>❌ Потеряно</h3>
+            <p class="count">{{ lost_count }}</p>
+        </div>
+    </div>
+</div>
+
+<div class="recent-items">
+    <h3>📦 Последние добавленные предметы:</h3>
+    
+    {% if recent_items %}
+        <div class="items-grid">
+            {% for item in recent_items %}
+            <div class="item-card {% if item.found %}found{% else %}lost{% endif %}">
+                <h4>{{ item.title }}</h4>
+                <p>{{ item.description|truncatechars:120 }}</p>
                 <div class="item-meta">
                     <span class="status">
                         {% if item.found %}
@@ -6,7 +43,7 @@
                             🔴 Потеряно
                         {% endif %}
                     </span>
-                    <span class="date">{{ item.created_at|date:"d.m.Y" }}</span>
+                    <span class="date">{{ item.date_created|date:"d.m.Y" }}</span>
                 </div>
                 <div class="action-buttons">
                     <a href="{% url 'item_detail' item.id %}" class="btn-api">Подробнее</a>
@@ -15,6 +52,7 @@
             </div>
             {% endfor %}
         </div>
+        
         <div style="text-align: center; margin-top: 2rem;">
             <a href="{% url 'item_list' %}" class="btn-api" style="padding: 1rem 2rem; font-size: 1.1rem;">
                 📋 Посмотреть все предметы

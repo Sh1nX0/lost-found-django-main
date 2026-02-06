@@ -4,18 +4,15 @@ Django settings for lostfound project.
 
 import os
 from pathlib import Path
-from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY', default='django-insecure-your-secret-key-here')
+SECRET_KEY = 'django-insecure-development-key-change-in-production'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=True, cast=bool)
-
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
+DEBUG = True
 
 # Application definition
 INSTALLED_APPS = [
@@ -37,14 +34,14 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # Для статики
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django_browser_reload.middleware.BrowserReloadMiddleware',  # Авто-перезагрузка
+    'django_browser_reload.middleware.BrowserReloadMiddleware',
 ]
 
 ROOT_URLCONF = 'lostfound.urls'
@@ -74,11 +71,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
-# Для продакшена (Railway/Render)
-if 'DATABASE_URL' in os.environ:
-    import dj_database_url
-    DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -117,7 +109,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Django REST Framework
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',  # Для тестирования
+        'rest_framework.permissions.AllowAny',
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
@@ -125,3 +117,36 @@ REST_FRAMEWORK = {
 
 # Whitenoise для статики
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# ===== БЕЗОПАСНОСТЬ ДЛЯ РАЗРАБОТКИ =====
+ALLOWED_HOSTS = ['*']
+
+# Настройки CSRF для разработки
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+    'https://localhost:8000',
+    'https://127.0.0.1:8000',
+]
+
+# Настройки куки
+CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_SAMESITE = 'Lax'
+
+# Для GitHub Codespaces
+if 'CODESPACE_NAME' in os.environ:
+    codespace_name = os.getenv('CODESPACE_NAME')
+    codespace_domain = os.getenv('GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN', 'app.github.dev')
+    
+    if codespace_name:
+        origin = f'https://{codespace_name}-8000.{codespace_domain}'
+        CSRF_TRUSTED_ORIGINS.append(origin)
+        ALLOWED_HOSTS.append(f'{codespace_name}-8000.{codespace_domain}')
+
+print("=" * 50)
+print(f"DEBUG: {DEBUG}")
+print(f"ALLOWED_HOSTS: {ALLOWED_HOSTS}")
+print(f"python manage.py runserverCSRF_TRUSTED_ORIGINS: {CSRF_TRUSTED_ORIGINS}")
+print("=" * 50)

@@ -3,16 +3,16 @@ from django.core.paginator import Paginator
 from .models import Item
 
 def home(request):
-    total = Item.objects.count()
-    found = Item.objects.filter(status='found').count()
-    lost = Item.objects.filter(status='lost').count()
-    recent = Item.objects.all().order_by('-date_created')[:6]
+    total_items = Item.objects.count()
+    found_count = Item.objects.filter(status='found').count()
+    lost_count = Item.objects.filter(status='lost').count()
+    recent_items = Item.objects.all().order_by('-date_created')[:6]  # ← Исправлено
     
     context = {
-        'total_items': total,
-        'found_count': found,
-        'lost_count': lost,
-        'recent_items': recent,
+        'total_items': total_items,
+        'found_count': found_count,
+        'lost_count': lost_count,
+        'recent_items': recent_items,
     }
     return render(request, 'core/home.html', context)
 
@@ -20,20 +20,21 @@ def item_list(request):
     status_filter = request.GET.get('status', 'all')
     
     if status_filter == 'found':
-        items = Item.objects.filter(status='found')
+        items_list = Item.objects.filter(status='found')
     elif status_filter == 'lost':
-        items = Item.objects.filter(status='lost')
+        items_list = Item.objects.filter(status='lost')
     else:
-        items = Item.objects.all()
+        items_list = Item.objects.all()
     
-    paginator = Paginator(items.order_by('-date_created'), 10)
-    page = request.GET.get('page')
-    page_obj = paginator.get_page(page)
+    paginator = Paginator(items_list.order_by('-date_created'), 10)  # ← Исправлено
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
     
     context = {
         'items': page_obj,
         'page_obj': page_obj,
         'is_paginated': paginator.num_pages > 1,
+        'status_filter': status_filter,
     }
     return render(request, 'core/item_list.html', context)
 
