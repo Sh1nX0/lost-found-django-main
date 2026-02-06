@@ -29,7 +29,7 @@ INSTALLED_APPS = [
     
     # Local apps
     'core',
-    'items',
+    
 ]
 
 MIDDLEWARE = [

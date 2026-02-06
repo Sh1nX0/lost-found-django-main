@@ -1,52 +1,23 @@
-from rest_framework import viewsets, status, permissions
+from rest_framework import viewsets
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework.views import APIView
-from django.shortcuts import get_object_or_404
-from .models import Item
-from .serializers import ItemSerializer
+from .models import Item, Category, Location
+from .serializers import ItemSerializer, CategorySerializer, LocationSerializer
+
+# ViewSets для автоматического создания CRUD endpoints
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+class LocationViewSet(viewsets.ModelViewSet):
+    queryset = Location.objects.all()
+    serializer_class = LocationSerializer
 
 class ItemViewSet(viewsets.ModelViewSet):
-    queryset = Item.objects.all().order_by('-date_created')  # ← Исправлено
+    queryset = Item.objects.all().order_by('-date_created')
     serializer_class = ItemSerializer
-    permission_classes = [permissions.AllowAny]
 
-class ItemListAPIView(APIView):
-    permission_classes = [permissions.AllowAny]
-    
-    def get(self, request):
-        items = Item.objects.all().order_by('-date_created')  # ← Исправлено
-        serializer = ItemSerializer(items, many=True)
-        return Response(serializer.data)
-    
-    def post(self, request):
-        serializer = ItemSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-class ItemDetailAPIView(APIView):
-    permission_classes = [permissions.AllowAny]
-    
-    def get(self, request, pk):
-        item = get_object_or_404(Item, pk=pk)
-        serializer = ItemSerializer(item)
-        return Response(serializer.data)
-    
-    def put(self, request, pk):
-        item = get_object_or_404(Item, pk=pk)
-        serializer = ItemSerializer(item, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def delete(self, request, pk):
-        item = get_object_or_404(Item, pk=pk)
-        item.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
+# Дополнительный endpoint для статистики
 @api_view(['GET'])
 def item_stats(request):
     total = Item.objects.count()

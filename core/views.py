@@ -6,7 +6,7 @@ def home(request):
     total_items = Item.objects.count()
     found_count = Item.objects.filter(status='found').count()
     lost_count = Item.objects.filter(status='lost').count()
-    recent_items = Item.objects.all().order_by('-date_created')[:6]  # ← Исправлено
+    recent_items = Item.objects.all().order_by('-date_created')[:6]
     
     context = {
         'total_items': total_items,
@@ -26,7 +26,7 @@ def item_list(request):
     else:
         items_list = Item.objects.all()
     
-    paginator = Paginator(items_list.order_by('-date_created'), 10)  # ← Исправлено
+    paginator = Paginator(items_list.order_by('-date_created'), 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
